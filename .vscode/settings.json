@@ -1,8 +1,0 @@
-{
-    "files.associations": {
-        "notewind": "plaintext",
-        "iomanip": "cpp",
-        "stdexcept": "cpp",
-        "string": "cpp"
-    }
-}

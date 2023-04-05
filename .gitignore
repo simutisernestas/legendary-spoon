@@ -2,3 +2,9 @@ build
 devel
 log
 note
+sandbox.ipynb
+sandbox.py
+control.ipynb
+main.cpp
+a.out
+.catkin_workspace

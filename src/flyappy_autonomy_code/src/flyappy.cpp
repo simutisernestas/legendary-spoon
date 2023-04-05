@@ -33,7 +33,8 @@ void Flyappy::processLaserRay(double distance, double angle)
     occ_grid_.setCellAt(OccGrid::Occupancy::Obstacle, map_x, map_y);
 }
 
-void Flyappy::planPath(Vec goal) {
+void Flyappy::planPath(Vec goal)
+{
     auto path = AStar(occ_grid_, p_.x, p_.y, goal.x, goal.y);
     latest_plan_ = path;
 }
