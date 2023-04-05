@@ -15,9 +15,17 @@ FlyappyRos::FlyappyRos(ros::NodeHandle& nh)
 
 void FlyappyRos::velocityCallback(const geometry_msgs::Vector3::ConstPtr& msg)
 {
+    Vec vel{msg->x, msg->y};
+    flyappy_.integrateVel(vel);
+    Vec pos{};
+    flyappy_.getPos(pos);
+    ROS_INFO("Position x: %f, y: %f", pos.x, pos.y);
+    ROS_INFO("Velocity x: %f, y: %f", msg->x, msg->y);
+
+    flyappy_.planPath({pos.x + 5.0, pos.y});
+
     // Example of publishing acceleration command to Flyappy
     geometry_msgs::Vector3 acc_cmd;
-
     acc_cmd.x = 0;
     acc_cmd.y = 0;
     pub_acc_cmd_.publish(acc_cmd);
@@ -25,8 +33,22 @@ void FlyappyRos::velocityCallback(const geometry_msgs::Vector3::ConstPtr& msg)
 
 void FlyappyRos::laserScanCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
 {
-    // Example of printing laser angle and range
-    ROS_INFO("Laser range: %f, angle: %f", msg->ranges[0], msg->angle_min);
+    // iterate measurements
+    for (uint32_t i = 0; i < msg->ranges.size(); i++)
+    {
+        // check if range between min & max
+        if (msg->ranges[i] <= msg->range_min || msg->ranges[i] >= msg->range_max) continue;
+        flyappy_.processLaserRay(msg->ranges[i],
+                                 msg->angle_min + i * msg->angle_increment);
+        // print measurement
+        ROS_INFO("Laser scan: %f, %f", msg->ranges[i],
+                 msg->angle_min + i * msg->angle_increment);
+        // print min/max laser scan message
+        ROS_INFO("Laser scan min: %f, max: %f", msg->range_min, msg->range_max);
+        // print min/max angles
+        ROS_INFO("Laser scan angle min: %f, max: %f", msg->angle_min,
+                 msg->angle_max);
+    }
 }
 
 void FlyappyRos::gameEndedCallback(const std_msgs::Bool::ConstPtr& msg)
@@ -39,6 +61,4 @@ void FlyappyRos::gameEndedCallback(const std_msgs::Bool::ConstPtr& msg)
     {
         ROS_INFO("End of countdown.");
     }
-
-    flyappy_ = {};
 }

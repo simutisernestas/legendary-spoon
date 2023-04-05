@@ -1,8 +1,7 @@
 #pragma once
 
-#include <ros/ros.h>
-
 #include <geometry_msgs/Vector3.h>
+#include <ros/ros.h>
 #include <sensor_msgs/LaserScan.h>
 #include <std_msgs/Bool.h>
 
@@ -23,5 +22,5 @@ class FlyappyRos
     ros::Subscriber sub_laser_scan_;  ///< Subscriber for laser scan
     ros::Subscriber sub_game_ended_;  ///< Subscriber for crash detection
 
-    Flyappy flyappy_;  ///< ROS-free main code
+    Flyappy flyappy_{};  ///< ROS-free main code
 };

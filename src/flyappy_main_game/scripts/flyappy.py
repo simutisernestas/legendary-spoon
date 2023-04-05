@@ -109,11 +109,11 @@ def main():
     else:
         soundExt = '.ogg'
 
-    SOUNDS['die']    = pygame.mixer.Sound(PATHTOFLYAPPY + '/assets/audio/die' + soundExt)
-    SOUNDS['hit']    = pygame.mixer.Sound(PATHTOFLYAPPY + '/assets/audio/hit' + soundExt)
-    SOUNDS['point']  = pygame.mixer.Sound(PATHTOFLYAPPY + '/assets/audio/point' + soundExt)
-    SOUNDS['swoosh'] = pygame.mixer.Sound(PATHTOFLYAPPY + '/assets/audio/swoosh' + soundExt)
-    SOUNDS['wing']   = pygame.mixer.Sound(PATHTOFLYAPPY + '/assets/audio/wing' + soundExt)
+    # SOUNDS['die']    = pygame.mixer.Sound(PATHTOFLYAPPY + '/assets/audio/die' + soundExt)
+    # SOUNDS['hit']    = pygame.mixer.Sound(PATHTOFLYAPPY + '/assets/audio/hit' + soundExt)
+    # SOUNDS['point']  = pygame.mixer.Sound(PATHTOFLYAPPY + '/assets/audio/point' + soundExt)
+    # SOUNDS['swoosh'] = pygame.mixer.Sound(PATHTOFLYAPPY + '/assets/audio/swoosh' + soundExt)
+    # SOUNDS['wing']   = pygame.mixer.Sound(PATHTOFLYAPPY + '/assets/audio/wing' + soundExt)
 
     while True:
         # select random background sprites
@@ -164,7 +164,7 @@ def showWelcomeAnimation():
 
     playerx = int(SCREENWIDTH*0.13)
     playery = int((SCREENHEIGHT - IMAGES['player'][0].get_height()) / 2)
-
+    
     messagex = int((SCREENWIDTH - IMAGES['message'].get_width()) / 2)
     messagey = int(SCREENHEIGHT * 0.12)
 
@@ -321,7 +321,7 @@ def mainGame(movementInfo):
                 if betweenPipes == 0:
                     score += 1
                     betweenPipes = 1
-                    SOUNDS['point'].play()
+                    # SOUNDS['point'].play()
         if pipeCounter == 0:
             betweenPipes = 0
         # playerIndex basex change
@@ -404,11 +404,11 @@ def showGameOverScreen(crashInfo):
 
     upperPipes, lowerPipes = crashInfo['upperPipes'], crashInfo['lowerPipes']
 
-    # play hit and die sounds
-    if not crashInfo['timeRanOut']:
-        SOUNDS['hit'].play()
-    if not crashInfo['groundCrash']:
-        SOUNDS['die'].play()
+    # # play hit and die sounds
+    # if not crashInfo['timeRanOut']:
+    #     SOUNDS['hit'].play()
+    # if not crashInfo['groundCrash']:
+    #     SOUNDS['die'].play()
 
     while True:
         for event in pygame.event.get():
