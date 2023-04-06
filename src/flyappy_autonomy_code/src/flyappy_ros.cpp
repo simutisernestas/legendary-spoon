@@ -19,15 +19,21 @@ void FlyappyRos::velocityCallback(const geometry_msgs::Vector3::ConstPtr& msg)
     flyappy_.integrateVel(vel);
     Vec pos{};
     flyappy_.getPos(pos);
-    ROS_INFO("Position x: %f, y: %f", pos.x, pos.y);
-    ROS_INFO("Velocity x: %f, y: %f", msg->x, msg->y);
+    flyappy_.planPath({pos.x + 5.0, 2.5});
+    // flyappy_.renderViz();
 
-    flyappy_.planPath({pos.x + 5.0, pos.y});
+    std::vector<Vec> path;
+    flyappy_.getPlan(path);
+    Vec track_point = path[2];
+    track_point.y += .15; // half of resolution
+    Vec track_vel = {0.0, 0.0};
 
-    // Example of publishing acceleration command to Flyappy
-    geometry_msgs::Vector3 acc_cmd;
-    acc_cmd.x = 0;
-    acc_cmd.y = 0;
+    auto ux = -0.9761376149468296 * (pos.x - track_point.x) - 1.4309296608236848 * (vel.x - track_vel.x);
+    auto uy = -9.28017830620232 * (pos.y - track_point.y) - 4.318156819963757 * (vel.y - track_vel.y);
+    geometry_msgs::Vector3 acc_cmd{};
+    acc_cmd.x = ux;
+    acc_cmd.y = uy;
+    ROS_INFO("Publish acceleration command x: %f, y: %f", acc_cmd.x, acc_cmd.y);
     pub_acc_cmd_.publish(acc_cmd);
 }
 
@@ -37,17 +43,10 @@ void FlyappyRos::laserScanCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
     for (uint32_t i = 0; i < msg->ranges.size(); i++)
     {
         // check if range between min & max
-        if (msg->ranges[i] <= msg->range_min || msg->ranges[i] >= msg->range_max) continue;
+        if (msg->ranges[i] <= msg->range_min || msg->ranges[i] >= msg->range_max)
+            continue;
         flyappy_.processLaserRay(msg->ranges[i],
                                  msg->angle_min + i * msg->angle_increment);
-        // print measurement
-        ROS_INFO("Laser scan: %f, %f", msg->ranges[i],
-                 msg->angle_min + i * msg->angle_increment);
-        // print min/max laser scan message
-        ROS_INFO("Laser scan min: %f, max: %f", msg->range_min, msg->range_max);
-        // print min/max angles
-        ROS_INFO("Laser scan angle min: %f, max: %f", msg->angle_min,
-                 msg->angle_max);
     }
 }
 

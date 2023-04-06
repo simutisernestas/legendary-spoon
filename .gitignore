@@ -8,3 +8,4 @@ control.ipynb
 main.cpp
 a.out
 .catkin_workspace
+.vscode

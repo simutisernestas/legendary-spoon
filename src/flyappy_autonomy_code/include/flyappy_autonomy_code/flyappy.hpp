@@ -41,22 +41,6 @@ class OccGrid
         }
     }
 
-    ~OccGrid()
-    {
-        // dump occupancy grid to file to visualize
-        std::ofstream file;
-        file.open("/workspaces/flyappy_autonomy_test_public/occ_grid.txt");
-        for (int i = 0; i < height_; i++)
-        {
-            for (int j = 0; j < width_; j++)
-            {
-                // write 0 if empty, 1 if obstacle and seperate cells by spaces
-                file << static_cast<int>(data_[index(j, i)]) << " ";
-            }
-            file << std::endl;
-        }
-    }
-
     Occupancy getCellAt(double x, double y) const
     {
         if (x < 0 || y < 0 || x >= width_ * resolution_ || y >= height_ * resolution_)
@@ -66,6 +50,7 @@ class OccGrid
                       << std::endl;
             throw std::out_of_range("Cell coordinates out of range");
         }
+        // TODO: replace with getGridCoords
         int row = static_cast<int>(y / resolution_);
         int col = static_cast<int>(x / resolution_);
         return data_[index(col, row)];
@@ -76,24 +61,28 @@ class OccGrid
         if (x < 0 || y < 0 || x >= width_ * resolution_ || y >= height_ * resolution_)
         {
             // print debug info
-            std::cout << "x: " << x << " y: " << y << " width: " << width_
-                      << " height: " << height_ << " resolution: " << resolution_
-                      << std::endl;
-            throw std::out_of_range("Cell coordinates out of range");
+            // std::cout << "x: " << x << " y: " << y << " width: " << width_
+            //           << " height: " << height_ << " resolution: " << resolution_
+            //           << std::endl;
+            // throw std::out_of_range("Cell SET coordinates out of range");
+            return;  // TODO: handle
         }
-
+        // TODO: replace with getGridCoords
         int row = static_cast<int>(y / resolution_);
         int col = static_cast<int>(x / resolution_);
-        // print set at
-        std::cout << "set at: " << col << " " << row << std::endl;
-        // also print x,y
-        std::cout << "x,y: " << x << " " << y << std::endl;
         data_[index(col, row)] = occ;
+    }
+
+    void getGridCoords(double x, double y, int& grid_x, int& grid_y) const
+    {
+        grid_x = static_cast<int>(x / resolution_);
+        grid_y = static_cast<int>(y / resolution_);
     }
 
     double getResolution() const { return resolution_; }
     int getWidth() const { return width_; }
     int getHeight() const { return height_; }
+    void getMap(std::vector<Occupancy>& map) const { map = data_; };
 
   private:
     int width_;
@@ -139,6 +128,7 @@ class Flyappy
     void processLaserRay(double distance, double angle);
     void planPath(Vec goal);
     inline void getPlan(std::vector<Vec>& plan) { plan = latest_plan_; };
+    void renderViz();
 
   private:
     double dt_{1.0 / 30.0};  // 30 FPS game
@@ -151,7 +141,8 @@ class Flyappy
     // width = 432 * 0.01 = 4.32 [m]
     // height = 512 * 0.01 = 5.12 [m]
     // increase width by 100 to have enough space
-    OccGrid occ_grid_{4.32 * 100, 5.12, 0.1};
+    // TODO: inscrese?
+    OccGrid occ_grid_{4.32 * 20, 5.12, 0.3};
     std::vector<Vec> latest_plan_;
 };
 
@@ -280,4 +271,67 @@ std::vector<Vec> AStar(const OccGrid& grid, double start_x, double start_y, doub
 
     // goal not found
     return path_meters;
+}
+
+void PID_control_loop(double desired_x, double desired_y, double kp, double ki, double kd,
+                      double v_x, double v_y, double x, double y, double dt,
+                      std::vector<std::pair<double, double>>& cmd_seq)
+{
+    double error_x = 0;
+    double error_y = 0;
+    double integral_x = 0;
+    double integral_y = 0;
+    double derivative_x = 0;
+    double derivative_y = 0;
+
+    double previous_error_x = 0.0;
+    double previous_error_y = 0.0;
+
+    double eps = 0.3;
+
+    while (true)
+    {
+        // Measure current position and velocity
+        double current_x = x;
+        double current_y = y;
+        double current_vx = v_x;
+        double current_vy = v_y;
+
+        // Calculate error between desired and current position
+        error_x = desired_x - current_x;
+        error_y = desired_y - current_y;
+
+        // Calculate integral of error
+        integral_x += error_x * dt;
+        integral_y += error_y * dt;
+
+        // Calculate derivative of error
+        derivative_x = (error_x - previous_error_x) / dt;
+        derivative_y = (error_y - previous_error_y) / dt;
+
+        // Calculate control output using PID equation
+        double control_x = kp * error_x + ki * integral_x + kd * derivative_x;
+        double control_y = kp * error_y + ki * integral_y + kd * derivative_y;
+
+        cmd_seq.push_back({control_x, control_y});
+
+        // Send control output to system as acceleration
+        v_x += control_x * dt;
+        v_y += control_y * dt;
+        x += v_x * dt;
+        y += v_y * dt;
+
+        // Check if desired point is reached and velocity is very small
+        if (abs(x - desired_x) < eps && abs(y - desired_y) < eps && abs(v_x) < eps &&
+            abs(v_y) < eps)
+        {
+            // reverse cmd_seq
+            std::reverse(cmd_seq.begin(), cmd_seq.end());
+            break;
+        }
+
+        // Update previous error for next iteration
+        previous_error_x = error_x;
+        previous_error_y = error_y;
+    }
 }

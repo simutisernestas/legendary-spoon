@@ -15,11 +15,14 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
 )
 
+find_package( OpenCV REQUIRED ) 
+
 catkin_package()
 
-include_directories(include)
+include_directories(include ${OpenCV_INCLUDE_DIRS})
 
-add_library(flyappy src/flyappy.cpp)
+add_library(flyappy src/flyappy.cpp)  
+target_link_libraries(flyappy ${OpenCV_LIBS})
 
 add_library(flyappy_ros src/flyappy_ros.cpp)
 target_include_directories(flyappy_ros PRIVATE ${catkin_INCLUDE_DIRS})
