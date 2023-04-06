@@ -142,7 +142,7 @@ class Flyappy
     // height = 512 * 0.01 = 5.12 [m]
     // increase width by 100 to have enough space
     // TODO: inscrese?
-    OccGrid occ_grid_{4.32 * 20, 5.12, 0.3};
+    OccGrid occ_grid_{4.32 * 20, 5.12, 0.25};
     std::vector<Vec> latest_plan_;
 };
 
@@ -218,8 +218,10 @@ std::vector<Vec> AStar(const OccGrid& grid, double start_x, double start_y, doub
                     auto occ = grid.getCellAt(x * grid.getResolution(),
                                               y * grid.getResolution());
                     if (occ == OccGrid::Occupancy::Obstacle) continue;
+                    
+                    auto H = std::hypot(col, row) > 1.0 ? 10.0 : std::hypot(col, row);
 
-                    double g = current_node->g + std::hypot(col, row);
+                    double g = current_node->g + H;
                     double h = std::hypot(goal_node->x - x, goal_node->y - y);
                     Node* neighbor_node = new Node(x, y, g, h, current_node);
 

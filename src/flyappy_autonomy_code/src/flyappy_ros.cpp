@@ -15,21 +15,28 @@ FlyappyRos::FlyappyRos(ros::NodeHandle& nh)
 
 void FlyappyRos::velocityCallback(const geometry_msgs::Vector3::ConstPtr& msg)
 {
+    static int counter = 0;
+    counter++;
+
     Vec vel{msg->x, msg->y};
     flyappy_.integrateVel(vel);
     Vec pos{};
     flyappy_.getPos(pos);
-    flyappy_.planPath({pos.x + 5.0, 2.5});
+    flyappy_.planPath({pos.x + 3.0, 2.5});
+    // if (counter % 10 == 0) flyappy_.renderViz();
     // flyappy_.renderViz();
 
     std::vector<Vec> path;
     flyappy_.getPlan(path);
-    Vec track_point = path[2];
-    track_point.y += .15; // half of resolution
-    Vec track_vel = {0.0, 0.0};
+    if (path.empty()) return;
+    Vec track_point = path[1];
+    track_point.y += .125;  // half of resolution
+    Vec track_vel = {.3, 0.0};
 
-    auto ux = -0.9761376149468296 * (pos.x - track_point.x) - 1.4309296608236848 * (vel.x - track_vel.x);
-    auto uy = -9.28017830620232 * (pos.y - track_point.y) - 4.318156819963757 * (vel.y - track_vel.y);
+    auto ux = -0.9767059149738836 * (pos.x - track_point.x) -
+              1.3976451015719364 * (vel.x - track_vel.x);
+    auto uy = -27.699915176080157 * (pos.y - track_point.y) -
+              7.443106230073582 * (vel.y - track_vel.y);
     geometry_msgs::Vector3 acc_cmd{};
     acc_cmd.x = ux;
     acc_cmd.y = uy;

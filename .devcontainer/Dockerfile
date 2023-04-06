@@ -3,7 +3,7 @@ FROM ros:noetic
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
    # openbox
-   && apt-get -y install --no-install-recommends python3-pygame libopencv-dev \ 
+   && apt-get -y install --no-install-recommends python3-pygame libopencv-dev gdb \ 
    && apt-get autoremove -y \
    && apt-get clean -y \
    && rm -rf /var/lib/apt/lists/*
