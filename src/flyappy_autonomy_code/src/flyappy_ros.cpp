@@ -11,36 +11,29 @@ FlyappyRos::FlyappyRos(ros::NodeHandle& nh)
       sub_game_ended_(nh.subscribe("/flyappy_game_ended", QUEUE_SIZE,
                                    &FlyappyRos::gameEndedCallback, this))
 {
+
+    // std::string global_name, relative_name, default_param;
+    // if (nh.getParam("/global_name", global_name))
+    // {
+    //  TODO:
+    // }
 }
 
 void FlyappyRos::velocityCallback(const geometry_msgs::Vector3::ConstPtr& msg)
 {
-    static int counter = 0;
-    counter++;
-
     Vec vel{msg->x, msg->y};
     flyappy_.integrateVel(vel);
-    Vec pos{};
-    flyappy_.getPos(pos);
-    flyappy_.planPath({pos.x + 3.0, 2.5});
-    // if (counter % 10 == 0) flyappy_.renderViz();
-    // flyappy_.renderViz();
 
-    std::vector<Vec> path;
-    flyappy_.getPlan(path);
-    if (path.empty()) return;
-    Vec track_point = path[1];
-    track_point.y += .125;  // half of resolution
-    Vec track_vel = {.3, 0.0};
+    flyappy_.planPathForward();
 
-    auto ux = -0.9767059149738836 * (pos.x - track_point.x) -
-              1.3976451015719364 * (vel.x - track_vel.x);
-    auto uy = -27.699915176080157 * (pos.y - track_point.y) -
-              7.443106230073582 * (vel.y - track_vel.y);
+    // do we have obstacle in front? if not could speed up?
+
+    double ux, uy;
+    flyappy_.getControlInputs(vel, ux, uy);
+
     geometry_msgs::Vector3 acc_cmd{};
     acc_cmd.x = ux;
     acc_cmd.y = uy;
-    ROS_INFO("Publish acceleration command x: %f, y: %f", acc_cmd.x, acc_cmd.y);
     pub_acc_cmd_.publish(acc_cmd);
 }
 

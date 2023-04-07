@@ -2,14 +2,6 @@
 
 #include "flyappy_autonomy_code/flyappy.hpp"
 
-TEST(MyFeature, Something)
-{
-    Flyappy flyappy;
-
-    const int a = 1;
-    EXPECT_EQ(a, 1);
-}
-
 TEST(Planner, CanPlanAStraithPathThroughEmptySpace)
 {
     Flyappy flyappy{};
