@@ -48,6 +48,16 @@ struct Vec
     double y;
 };
 
+struct ControlParams
+{
+    double kx;
+    double ky;
+    double kvx;
+    double kvy;
+    double front_x;
+    double vel_ref;
+};
+
 class Flyappy
 {
   public:
@@ -62,6 +72,7 @@ class Flyappy
     void getControlInputs(const Vec& vel, double& ux, double& uy);
 
     inline void getPlan(std::vector<Vec>& plan) { plan = latest_plan_; };
+    inline void setControlParams(ControlParams params) { params_ = params; };
 
   private:
     Vec p_{56.0 * SCALING,  // taken out from game internals - starting position
@@ -71,6 +82,8 @@ class Flyappy
     // increase width to have enough space
     OccGrid occ_grid_{4.32 * 20, 5.12, 0.2};
     std::vector<Vec> latest_plan_;
+    ControlParams params_{0.97, 27.69, 1.39,
+                          7.44,  2.0,    .3};  // default params from control.ipynb
 };
 
 std::vector<Vec> AStar(const OccGrid& grid, double start_x, double start_y, double goal_x,

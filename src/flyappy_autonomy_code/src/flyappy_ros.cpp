@@ -11,12 +11,17 @@ FlyappyRos::FlyappyRos(ros::NodeHandle& nh)
       sub_game_ended_(nh.subscribe("/flyappy_game_ended", QUEUE_SIZE,
                                    &FlyappyRos::gameEndedCallback, this))
 {
+    // take in double params kx,ky,kvx,kvy,front_x
+    double kx, ky, kvx, kvy, front_x, vel_ref;
+    nh.param<double>("kx", kx, 0.0);
+    nh.param<double>("ky", ky, 0.0);
+    nh.param<double>("kvx", kvx, 0.0);
+    nh.param<double>("kvy", kvy, 0.0);
+    nh.param<double>("front_x", front_x, 0.0);
+    nh.param<double>("vel_ref", vel_ref, 0.0);
 
-    // std::string global_name, relative_name, default_param;
-    // if (nh.getParam("/global_name", global_name))
-    // {
-    //  TODO:
-    // }
+    ControlParams params{kx, ky, kvx, kvy, front_x, vel_ref};
+    flyappy_.setControlParams(params);
 }
 
 void FlyappyRos::velocityCallback(const geometry_msgs::Vector3::ConstPtr& msg)

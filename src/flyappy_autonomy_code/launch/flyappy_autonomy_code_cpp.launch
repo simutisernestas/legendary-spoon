@@ -1,7 +1,15 @@
 <launch>
-  <!-- TODO: -->
-  <param name="kx" type="double" value="1.0" />
-  
+  <!-- TODO: 
+  0.97, 27.69, 1.39,
+  7.44,  2.0,    .3}
+  -->
+  <param name="kx" type="double" value="1.97" />
+  <param name="ky" type="double" value="29.69" />
+  <param name="kvx" type="double" value="1.39" />
+  <param name="kvy" type="double" value="8.44" />
+  <param name="front_x" type="double" value="2.0" />
+  <param name="vel_ref" type="double" value="0.3" />
+
   <node name="flyappy_autonomy_code" pkg="flyappy_autonomy_code" type="flyappy_autonomy_code_node" output="screen" />
   <node name="flyappy_main_game" pkg="flyappy_main_game" type="flyappy.py" output="screen" required="true" />
 </launch>

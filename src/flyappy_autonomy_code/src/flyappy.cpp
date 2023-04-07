@@ -46,7 +46,7 @@ void Flyappy::planPath(Vec goal)
 
 void Flyappy::planPathForward()
 {
-    Vec goal{p_.x + 2.0, 2.5};
+    Vec goal{p_.x + params_.front_x, 2.5};
     planPath(goal);
 }
 
@@ -108,12 +108,10 @@ void Flyappy::getControlInputs(const Vec& vel, double& ux, double& uy)
         }
     }
 
-    static Vec track_vel = {.3, 0.0};
+    static Vec track_vel = {params_.vel_ref, 0.0};
 
-    ux = -0.9767059149738836 * (p_.x - track_point.x) -
-         1.3976451015719364 * (vel.x - track_vel.x);
-    uy = -27.699915176080157 * (p_.y - track_point.y) -
-         7.443106230073582 * (vel.y - track_vel.y);
+    ux = -params_.kx * (p_.x - track_point.x) - params_.kvx * (vel.x - track_vel.x);
+    uy = -params_.ky * (p_.y - track_point.y) - params_.kvy * (vel.y - track_vel.y);
 }
 
 ////////////////////////////////////////////
