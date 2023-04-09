@@ -225,12 +225,10 @@ std::vector<Vec> AStar(const OccGrid& grid, double start_x, double start_y, doub
     int iter_n = 0;
     while (!open_list.empty())
     {
+        // sometimes exceeds time limit of callback
         iter_n++;
-        if (iter_n > 1000)
-        {
-            std::cout << "A* search exceeded 1000 iterations" << std::endl;
-            break;
-        }
+        if (iter_n > 1000) break;
+
         // get node with lowest f value from open list
         Node* current_node = open_list[0];
         open_list.erase(open_list.begin());
@@ -256,6 +254,11 @@ std::vector<Vec> AStar(const OccGrid& grid, double start_x, double start_y, doub
                 double y = node->y * grid_res + (grid_res / 2);
                 path_meters.push_back({x, y});
             }
+
+            // clean memory
+            for (auto& node : open_list) delete node;
+            for (auto& node : closed_list) delete node;
+
             return path_meters;
         }
 
@@ -319,6 +322,10 @@ std::vector<Vec> AStar(const OccGrid& grid, double start_x, double start_y, doub
         // sort open list so the lowest cost is in the front
         std::sort(open_list.begin(), open_list.end(), CmpNodePtrs());
     }
+
+    // clean memory
+    for (auto& node : open_list) delete node;
+    for (auto& node : closed_list) delete node;
 
     // convert path to meters
     return std::vector<Vec>();

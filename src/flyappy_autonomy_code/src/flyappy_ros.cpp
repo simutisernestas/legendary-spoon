@@ -22,6 +22,7 @@ FlyappyRos::FlyappyRos(ros::NodeHandle& nh)
 
     ControlParams params{kx, ky, kvx, kvy, front_x, vel_ref};
     flyappy_.setControlParams(params);
+    control_params_ = params;
 }
 
 void FlyappyRos::velocityCallback(const geometry_msgs::Vector3::ConstPtr& msg)
@@ -67,4 +68,9 @@ void FlyappyRos::gameEndedCallback(const std_msgs::Bool::ConstPtr& msg)
     {
         ROS_INFO("End of countdown.");
     }
+
+    // reset
+    flyappy_ = {};
+    flyappy_.setControlParams(control_params_);
+    front_range_ = 10.0;
 }

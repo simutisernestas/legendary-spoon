@@ -24,4 +24,5 @@ class FlyappyRos
 
     Flyappy flyappy_{};  ///< ROS-free main code
     double front_range_{10.0};
+    ControlParams control_params_{};
 };
