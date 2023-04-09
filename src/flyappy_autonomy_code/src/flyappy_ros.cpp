@@ -31,10 +31,8 @@ void FlyappyRos::velocityCallback(const geometry_msgs::Vector3::ConstPtr& msg)
 
     flyappy_.planPathForward();
 
-    // do we have obstacle in front? if not could speed up?
-
     double ux, uy;
-    flyappy_.getControlInputs(vel, ux, uy);
+    flyappy_.getControlInputs(vel, ux, uy, front_range_);
 
     geometry_msgs::Vector3 acc_cmd{};
     acc_cmd.x = ux;
@@ -52,6 +50,10 @@ void FlyappyRos::laserScanCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
             continue;
         flyappy_.processLaserRay(msg->ranges[i],
                                  msg->angle_min + i * msg->angle_increment);
+        // save 0 range to variable
+        double eps = 0.05;
+        if (std::abs(msg->angle_min + i * msg->angle_increment) < eps)
+            front_range_ = msg->ranges[i];
     }
 }
 

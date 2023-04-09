@@ -69,7 +69,7 @@ class Flyappy
     void planPath(Vec goal);
     void planPathForward();
     void renderViz();
-    void getControlInputs(const Vec& vel, double& ux, double& uy);
+    void getControlInputs(const Vec& vel, double& ux, double& uy, double fr);
 
     inline void getPlan(std::vector<Vec>& plan) { plan = latest_plan_; };
     inline void setControlParams(ControlParams params) { params_ = params; };

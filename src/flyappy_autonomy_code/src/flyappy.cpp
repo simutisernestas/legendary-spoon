@@ -93,7 +93,7 @@ void Flyappy::renderViz()
     cv::waitKey(10);
 }
 
-void Flyappy::getControlInputs(const Vec& vel, double& ux, double& uy)
+void Flyappy::getControlInputs(const Vec& vel, double& ux, double& uy, double fr)
 {
     if (latest_plan_.empty()) return;
 
@@ -108,7 +108,9 @@ void Flyappy::getControlInputs(const Vec& vel, double& ux, double& uy)
         }
     }
 
-    static Vec track_vel = {params_.vel_ref, 0.0};
+    // if front range is less than 1.5m, slow down
+    Vec track_vel = {params_.vel_ref, 0.0};
+    if (fr < 1.5) track_vel.x = 0.0;
 
     ux = -params_.kx * (p_.x - track_point.x) - params_.kvx * (vel.x - track_vel.x);
     uy = -params_.ky * (p_.y - track_point.y) - params_.kvy * (vel.y - track_vel.y);
