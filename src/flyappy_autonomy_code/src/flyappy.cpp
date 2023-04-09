@@ -100,8 +100,7 @@ void Flyappy::getControlInputs(const Vec& vel, double& ux, double& uy, double fr
     Vec track_point;
     for (auto& point : latest_plan_)
     {
-        if (point.x >= p_.x + occ_grid_.getResolution() ||
-            point.y >= p_.y + occ_grid_.getResolution())
+        if (point.x >= p_.x + occ_grid_.getResolution())
         {
             track_point = point;
             break;
@@ -280,6 +279,7 @@ std::vector<Vec> AStar(const OccGrid& grid, double start_x, double start_y, doub
                     auto occ = grid.getCellAt(x * grid_res, y * grid_res);
                     if (occ == OccGrid::Occupancy::Obstacle) continue;
 
+                    // prefer more square paths, because diagonal makes it bounce to rocks
                     auto H = std::hypot(col, row) > 1.0 ? 10.0 : std::hypot(col, row);
 
                     double g = current_node->g + H;

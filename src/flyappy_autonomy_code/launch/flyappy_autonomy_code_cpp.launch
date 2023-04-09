@@ -6,7 +6,7 @@
   <param name="kvy" type="double" value="1.25733396e+01" />
 
   <param name="front_x" type="double" value="1.5" />
-  <param name="vel_ref" type="double" value="0.2" />
+  <param name="vel_ref" type="double" value="0.4" />
 
   <node name="flyappy_autonomy_code" pkg="flyappy_autonomy_code" type="flyappy_autonomy_code_node" output="screen" />
   <node name="flyappy_main_game" pkg="flyappy_main_game" type="flyappy.py" output="screen" required="true" />

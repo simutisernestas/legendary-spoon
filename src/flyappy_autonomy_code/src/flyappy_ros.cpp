@@ -9,7 +9,9 @@ FlyappyRos::FlyappyRos(ros::NodeHandle& nh)
       sub_laser_scan_(nh.subscribe("/flyappy_laser_scan", QUEUE_SIZE,
                                    &FlyappyRos::laserScanCallback, this)),
       sub_game_ended_(nh.subscribe("/flyappy_game_ended", QUEUE_SIZE,
-                                   &FlyappyRos::gameEndedCallback, this))
+                                   &FlyappyRos::gameEndedCallback, this)),
+      planner_timer_(  // 10 Hz
+              nh.createTimer(ros::Duration(.1), &FlyappyRos::plannerTimerCallback, this))
 {
     // take in double params kx,ky,kvx,kvy,front_x
     double kx, ky, kvx, kvy, front_x, vel_ref;
@@ -29,8 +31,6 @@ void FlyappyRos::velocityCallback(const geometry_msgs::Vector3::ConstPtr& msg)
 {
     Vec vel{msg->x, msg->y};
     flyappy_.integrateVel(vel);
-
-    flyappy_.planPathForward();
 
     double ux, uy;
     flyappy_.getControlInputs(vel, ux, uy, front_range_);
@@ -52,7 +52,7 @@ void FlyappyRos::laserScanCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
         flyappy_.processLaserRay(msg->ranges[i],
                                  msg->angle_min + i * msg->angle_increment);
         // save 0 range to variable
-        double eps = 0.05;
+        double eps = 0.01;
         if (std::abs(msg->angle_min + i * msg->angle_increment) < eps)
             front_range_ = msg->ranges[i];
     }
@@ -73,4 +73,9 @@ void FlyappyRos::gameEndedCallback(const std_msgs::Bool::ConstPtr& msg)
     flyappy_ = {};
     flyappy_.setControlParams(control_params_);
     front_range_ = 10.0;
+}
+
+void FlyappyRos::plannerTimerCallback(const ros::TimerEvent& event)
+{
+    flyappy_.planPathForward();
 }

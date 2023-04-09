@@ -83,7 +83,7 @@ class Flyappy
     OccGrid occ_grid_{4.32 * 20, 5.12, 0.2};
     std::vector<Vec> latest_plan_;
     ControlParams params_{0.97, 27.69, 1.39,
-                          7.44,  2.0,    .3};  // default params from control.ipynb
+                          7.44, 2.0,   .3};  // default params from control.ipynb
 };
 
 std::vector<Vec> AStar(const OccGrid& grid, double start_x, double start_y, double goal_x,
