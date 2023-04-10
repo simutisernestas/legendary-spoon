@@ -15,13 +15,14 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
 )
 
+# Could be removed if; only used for debugging, visualisation, etc.
 find_package( OpenCV REQUIRED ) 
+include_directories(include ${OpenCV_INCLUDE_DIRS})
 
 catkin_package()
 
-include_directories(include ${OpenCV_INCLUDE_DIRS})
-
 add_library(flyappy src/flyappy.cpp)  
+# Could be removed if; only used for debugging, visualisation, etc.
 target_link_libraries(flyappy ${OpenCV_LIBS})
 
 add_library(flyappy_ros src/flyappy_ros.cpp)

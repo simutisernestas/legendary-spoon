@@ -3,6 +3,8 @@
 #include <cmath>
 #include <iomanip>
 #include <iostream>
+
+// comment out if dependency is not installed
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -50,6 +52,7 @@ void Flyappy::planPathForward()
     planPath(goal);
 }
 
+// visualization; requires OpenCV; comment out if dependency is not installed
 void Flyappy::renderViz()
 {
     std::vector<OccGrid::Occupancy> map;
@@ -111,6 +114,7 @@ void Flyappy::getControlInputs(const Vec& vel, double& ux, double& uy, double fr
     Vec track_vel = {params_.vel_ref, 0.0};
     if (fr < 1.5) track_vel.x = 0.0;
 
+    // LQR design is in control.ipynb
     ux = -params_.kx * (p_.x - track_point.x) - params_.kvx * (vel.x - track_vel.x);
     uy = -params_.ky * (p_.y - track_point.y) - params_.kvy * (vel.y - track_vel.y);
 }

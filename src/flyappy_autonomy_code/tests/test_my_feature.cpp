@@ -2,6 +2,7 @@
 
 #include "flyappy_autonomy_code/flyappy.hpp"
 
+// just as an example to showcase how to write tests : )
 TEST(Planner, CanPlanAStraithPathThroughEmptySpace)
 {
     Flyappy flyappy{};
